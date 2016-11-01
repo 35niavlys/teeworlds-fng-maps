@@ -210,8 +210,8 @@ add_header 0 Maps
 
 find -maxdepth 1 -type d | sort | while read MAPS_DIR ; do
 	DIR_NAME="${MAPS_DIR#*/}"
-	if [ -f "$MAPS_DIR/maps.name" ] ; then
-		DIR_NAME=$(< "$MAPS_DIR/maps.name")
+	if [ -f "$MAPS_DIR/folder.name" ] ; then
+		DIR_NAME=$(< "$MAPS_DIR/folder.name")
 	fi
 
 	MAPS=$(find "$MAPS_DIR" -maxdepth 1 -name '*.map' -type f | sort | sed 's/\.\/\(.*\)\.map/\1/')
