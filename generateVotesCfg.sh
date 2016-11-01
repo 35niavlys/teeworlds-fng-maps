@@ -98,7 +98,7 @@ add_vote() {
 
 add_footer () {
 	set_prefix $1
-	FOOTER_SPACE="$FOOTER_SPACE "
+	FOOTER_SPACE="$FOOTER_SPACE "
 	add_to_conf "add_vote \"$PREFIX╰──────┤ $FOOTER_SPACE\" \"$OPTION_NO_ACTION\""
 	add_empty_vote $1
 }
@@ -119,6 +119,9 @@ add_to_conf clear_votes
 add_header 0 Misc
 
 add_vote 0 "Restart game" "restart"
+if [ $OPTION_NB_TEAMS -gt 1 ] ; then
+	add_vote 0 "Shuffle teams" "shuffle_teams"
+fi
 
 add_footer 0
 
@@ -128,6 +131,7 @@ if [ $OPTION_MAX_PLAYERS_PER_TEAM -gt 0 ] ; then
 	add_header 0 "Max player"
 	
 	MINIMAL_SPECTATOR_SLOTS=$(( $OPTION_MAX_CLIENTS - $OPTION_NB_TEAMS * $OPTION_MAX_PLAYERS_PER_TEAM ))
+	[ $MINIMAL_SPECTATOR_SLOTS -lt 0 ] && MINIMAL_SPECTATOR_SLOTS=0
 	
 	for SPECTATOR_SLOTS in $(seq $(( $OPTION_MAX_CLIENTS - 2 )) -$OPTION_NB_TEAMS $MINIMAL_SPECTATOR_SLOTS) ; do
 		NB=$(( $OPTION_MAX_CLIENTS - $SPECTATOR_SLOTS ))
