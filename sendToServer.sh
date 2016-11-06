@@ -1,6 +1,7 @@
 #!/bin/bash
 
 EC_ADDRESS=127.0.0.1
+CONF_DIR=conf
 
 show_help() {
 	echo "$0    Usage:"
@@ -26,8 +27,6 @@ for i in "$@" ; do
 	esac
 	shift
 done
-
-test -z "$CONF_DIR" && show_help
 
 FILES=$(find $CONF_DIR -maxdepth 1 -name '*.cfg')
 
