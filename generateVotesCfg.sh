@@ -216,6 +216,7 @@ add_header 0 Maps
 if [ "$OPTION_RANDOM_MAP" = "true" ] ; then
 	add_empty_vote 1
 	add_vote 0 "Random map" "exec conf/vote_random_map.cfg"
+	add_vote 0 "Random rotation" "activate_random_rotation"
 	add_empty_vote 1
 fi
 
