@@ -9,6 +9,7 @@ OPTION_NB_TEAMS=2
 OPTION_MAX_PLAYERS_PER_TEAM=8
 OPTION_WEAPONS=false
 OPTION_TUNE=false
+OPTION_RANDOM_MAP=false
 
 OPTION_NO_ACTION="say idiots"
 
@@ -24,6 +25,7 @@ show_help() {
 	echo "  --max-clients=<integer>              Default is 16"
 	echo "  --nb-teams=[1|2]                     Default is 2"
 	echo "  --max-players-per-team=<integer>     Default is 8"
+	echo "  --random-map=[true|false]            Default is false"
 	echo "  --tune=[true|false]                  Default is false"
 	echo "  --weapons=[true|false]               Default is false"
 	exit 1
@@ -43,11 +45,14 @@ for i in "$@" ; do
 		--max-players-per-team=*)
 			OPTION_MAX_PLAYERS_PER_TEAM=${i#*=}
 		;;
-		--weapons=*)
-			OPTION_WEAPONS=${i#*=}
+		--random-map=*)
+			OPTION_RANDOM_MAP=${i#*=}
 		;;
 		--tune=*)
 			OPTION_TUNE=${i#*=}
+		;;
+		--weapons=*)
+			OPTION_WEAPONS=${i#*=}
 		;;
 		*)
 			echo "Unknown param: $i"
@@ -208,6 +213,12 @@ fi
 
 add_header 0 Maps
 
+if [ "$OPTION_RANDOM_MAP" = "true" ] ; then
+	add_empty_vote 1
+	add_vote 0 "Random map" "exec conf/vote_random_map.cfg"
+	add_empty_vote 1
+fi
+
 find -maxdepth 1 -type d | sort | while read MAPS_DIR ; do
 	DIR_NAME="${MAPS_DIR#*/}"
 	if [ -f "$MAPS_DIR/folder.name" ] ; then
@@ -215,16 +226,18 @@ find -maxdepth 1 -type d | sort | while read MAPS_DIR ; do
 	fi
 
 	MAPS=$(find "$MAPS_DIR" -maxdepth 1 -name '*.map' -type f | sort | sed 's/\.\/\(.*\)\.map/\1/')
-	MAP_ROTATION="sv_maprotation $(echo $MAPS)"
-	add_header 1 "$DIR_NAME (vote to set rotation)" "$MAP_ROTATION"
-	echo "$MAPS" | while read MAP_PATH ; do
-		MAP_NAME=$(basename "$MAP_PATH")
-		if [ -f "$MAP_PATH.map.name" ] ; then
-                	MAP_NAME=$(< "$MAP_PATH.map.name")
-        	fi
-		add_vote 1 "$MAP_NAME" "sv_map $MAP_PATH"
-	done
-	add_footer 1
+	if [ -n "$MAPS" ] ; then
+		MAP_ROTATION="sv_maprotation $(echo $MAPS)"
+		add_header 1 "$DIR_NAME (vote to set rotation)" "$MAP_ROTATION"
+		echo "$MAPS" | while read MAP_PATH ; do
+			MAP_NAME=$(basename "$MAP_PATH")
+			if [ -f "$MAP_PATH.map.name" ] ; then
+				MAP_NAME=$(< "$MAP_PATH.map.name")
+			fi
+			add_vote 1 "$MAP_NAME" "sv_map $MAP_PATH"
+		done
+		add_footer 1
+	fi
 done
 
 add_footer 0
