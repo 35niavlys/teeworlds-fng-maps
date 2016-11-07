@@ -115,6 +115,16 @@ add_empty_vote() {
 	add_to_conf
 }
 
+set_stars() {
+	STARS=""
+	for (( i=1; i<=$1; i++ )) ; do  
+		STARS="$STARS★"
+	done
+	for (( i=$1; i<5; i++ )) ; do  
+		STARS="$STARS☆"
+	done
+}
+
 ###################
 
 add_to_conf clear_votes
@@ -231,11 +241,16 @@ find -maxdepth 1 -type d | sort | while read MAPS_DIR ; do
 		MAP_ROTATION="sv_maprotation $(echo $MAPS)"
 		add_header 1 "$DIR_NAME (vote to set rotation)" "$MAP_ROTATION"
 		echo "$MAPS" | while read MAP_PATH ; do
-			MAP_NAME=$(basename "$MAP_PATH")
-			if [ -f "$MAP_PATH.map.name" ] ; then
-				MAP_NAME=$(< "$MAP_PATH.map.name")
+			unset NAME RANK
+			NAME=$(basename "$MAP_PATH")
+			if [ -f "$MAP_PATH.map.properties" ] ; then
+				source "$MAP_PATH.map.properties"
+				if [ -n "$RANK" ] ; then
+					set_stars $RANK
+					NAME="$STARS $NAME"
+				fi
 			fi
-			add_vote 1 "$MAP_NAME" "sv_map $MAP_PATH"
+			add_vote 1 "$NAME" "sv_map $MAP_PATH"
 		done
 		add_footer 1
 	fi
