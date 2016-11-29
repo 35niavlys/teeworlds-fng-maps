@@ -23,16 +23,14 @@ function update_random_map {
 	done
 }
 
-LAST=$(date +%s)
-
 ./openfng.sh $@ | while read LINE ; do
 	echo "[$(date '+%d/%m/%Y %H:%M:%S')] $LINE"
-	if grep -q "\[datafile\]: loading done" <(echo $LINE) ; then
+	if grep -q "\[datafile\]: loading done" <<<"$LINE" ; then
 		update_random_map
-	elif grep "\[game\]: activate_random_rotation_" <(echo $LINE) | grep -qv "\[say\]" ; then
-		RANK=$(sed 's/.*activate_random_rotation_//' <<<$LINE)
+	elif grep "\[game\]: activate_random_rotation_" <<<"$LINE" | grep -qv "\[say\]" ; then
+		RANK=$(sed 's/.*activate_random_rotation_//' <<<"$LINE")
 		cat ${RANDOM_MAP_FILE}_${RANK}.cfg | ./sendToServer.sh
-	elif grep "\[game\]: activate_random_rotation" <(echo $LINE) | grep -qv "\[say\]" ; then
-		cat conf/vote_random_map.cfg | ./sendToServer.sh
+	elif grep "\[game\]: activate_random_rotation" <<<"$LINE" | grep -qv "\[say\]" ; then
+		cat ${RANDOM_MAP_FILE}.cfg | ./sendToServer.sh
 	fi
 done |& tee ./logs/teeworlds.log
