@@ -33,4 +33,4 @@ function update_random_map {
 	elif grep "\[game\]: activate_random_rotation" <<<"$LINE" | grep -qv "\[say\]" ; then
 		cat ${RANDOM_MAP_FILE}.cfg | ./sendToServer.sh
 	fi
-done |& tee ./logs/teeworlds.log
+done |& tee -a ./logs/teeworlds.log
