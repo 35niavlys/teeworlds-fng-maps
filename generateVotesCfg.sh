@@ -8,7 +8,7 @@ OPTION_MAX_CLIENTS=16
 OPTION_NB_TEAMS=2
 OPTION_MAX_PLAYERS_PER_TEAM=8
 OPTION_WEAPONS=false
-OPTION_TUNE=false
+OPTION_PHYSIC=false
 OPTION_RANDOM_MAP=false
 
 OPTION_NO_ACTION="say idiots"
@@ -48,8 +48,8 @@ for i in "$@" ; do
 		--random-map=*)
 			OPTION_RANDOM_MAP=${i#*=}
 		;;
-		--tune=*)
-			OPTION_TUNE=${i#*=}
+		--physic=*)
+			OPTION_PHYSIC=${i#*=}
 		;;
 		--weapons=*)
 			OPTION_WEAPONS=${i#*=}
@@ -188,33 +188,31 @@ add_footer 0
 if [ "$OPTION_WEAPONS" = "true" ] ; then
 	add_header 0 "Weapons options"
 
-	add_vote 0 "Reset Hammer and Laser" "tune_reset"
-	add_vote 0 "Hammer freeze 3s" "sv_hammer_freeze 3"
-	add_vote 0 "Hammer freeze 5s" "sv_hammer_freeze 5"
-	add_vote 0 "Hammer freeze 10s" "sv_hammer_freeze 10"
-	add_vote 0 "Hammer no freeze" "sv_hammer_freeze 0"
+	add_vote 0 "Reset Hammer and Laser" "sv_hammer_freeze 0;sv_hammer_scale_x 320;sv_hammer_scale_y 120;tune laser_damage 10;tune laser_bounce_cost 0"
+	add_vote 0 "Laser : no damage" "laser_damage 10"
+	add_vote 0 "Laser : Wallshoot only" "tune laser_damage 0;tune laser_bounce_cost -10"
+	add_vote 0 "Hammer : no freeze" "sv_hammer_freeze 0"
+	add_vote 0 "Hammer : freeze 3s" "sv_hammer_freeze 3"
+	add_vote 0 "Hammer : freeze 5s" "sv_hammer_freeze 5"
+	add_vote 0 "Hammer : freeze 10s" "sv_hammer_freeze 10"
+	add_vote 0 "Hammer : Normal" "sv_hammer_scale_x 320;sv_hammer_scale_y 120"
+	add_vote 0 "Hammer : Powerful" "sv_hammer_scale_x 640;sv_hammer_scale_y 240"
+	add_vote 0 "Hammer : GOD" "sv_hammer_scale_x 960;sv_hammer_scale_y 360"
 
 	add_footer 0
 fi
 
 ###################
 
-if [ "$OPTION_TUNE" = "true" ] ; then
-	add_header 0 "Tune Options"
+if [ "$OPTION_PHYSIC" = "true" ] ; then
+	add_header 0 "Physic Options"
 
-	add_vote 0 "Laser off" "tune laser_damage 0"
-	add_vote 0 "Laser on" "tune laser_damage 10"
-	add_vote 0 "Physic : Gravity ZERO" "tune gravity 0;say Warn ! Zero gravity means no lost of speed !"
-	add_vote 0 "Physic : I believe i can fly" "tune gravity 0.05"
-	add_vote 0 "Physic : Very low gravity" "tune gravity 0.20"
-	add_vote 0 "Physic : Low gravity" "tune gravity 0.40"
-	add_vote 0 "Physic : Normal gravity" "tune gravity 0.50"
-	add_vote 0 "Physic : Hard gravity" "tune gravity 0.80"
-	add_vote 0 "Mjollnir : Normal" "sv_hammer_scale_x 320;sv_hammer_scale_y 120"
-	add_vote 0 "Mjollnir : Powerful" "sv_hammer_scale_x 640;sv_hammer_scale_y 240"
-	add_vote 0 "Mjollnir : GOD" "sv_hammer_scale_x 960;sv_hammer_scale_y 360"
-	add_vote 0 "Reset tunes" "tune_reset"
-	add_vote 0 "Wallshoot only" "tune laser_damage 0;tune laser_bounce_cost -10;tune laser_bounce_delay 150;tune laser_bounce_num 1;tune laser_reach 800"
+	add_vote 0 "Gravity ZERO" "tune gravity 0;say Warn ! Zero gravity means no lost of speed !"
+	add_vote 0 "I believe i can fly" "tune gravity 0.05"
+	add_vote 0 "Very low gravity" "tune gravity 0.20"
+	add_vote 0 "Low gravity" "tune gravity 0.40"
+	add_vote 0 "Normal gravity" "tune gravity 0.50"
+	add_vote 0 "Hard gravity" "tune gravity 0.80"
 
 	add_footer 0
 fi
