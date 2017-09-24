@@ -7,6 +7,7 @@ RUN=false
 OPTION_MAX_CLIENTS=16
 OPTION_NB_TEAMS=2
 OPTION_MAX_PLAYERS_PER_TEAM=8
+OPTION_TIMELIMIT=false
 OPTION_WEAPONS=false
 OPTION_PHYSIC=false
 OPTION_RANDOM_MAP=false
@@ -25,7 +26,9 @@ show_help() {
 	echo "  --max-clients=<integer>              Default is 16"
 	echo "  --nb-teams=[1|2]                     Default is 2"
 	echo "  --max-players-per-team=<integer>     Default is 8"
+	echo "  --physic=[true|false]            Default is false"
 	echo "  --random-map=[true|false]            Default is false"
+	echo "  --timelimit=[true|false]             Default is false"
 	echo "  --tune=[true|false]                  Default is false"
 	echo "  --weapons=[true|false]               Default is false"
 	exit 1
@@ -50,6 +53,9 @@ for i in "$@" ; do
 		;;
 		--physic=*)
 			OPTION_PHYSIC=${i#*=}
+		;;
+		--timelimit=*)
+			OPTION_TIMELIMIT=${i#*=}
 		;;
 		--weapons=*)
 			OPTION_WEAPONS=${i#*=}
@@ -172,6 +178,20 @@ add_vote 0 "Score limit 700" "sv_scorelimit 700"
 add_vote 0 "Score limit 1000" "sv_scorelimit 1000"
 
 add_footer 0
+
+###################
+
+if [ "$OPTION_TIMELIMIT" = "true" ] ; then
+	add_header 0 "Time limit"
+
+	add_vote 0 "Time limit 5 min" "sv_timelimit 5"
+	add_vote 0 "Time limit 10 min" "sv_timelimit 10"
+	add_vote 0 "Time limit 20 min" "sv_timelimit 20"
+	add_vote 0 "Time limit 40 min" "sv_timelimit 40"
+	add_vote 0 "Time limit 60 min" "sv_timelimit 60"
+
+	add_footer 0
+fi
 
 ###################
 
