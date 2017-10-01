@@ -43,4 +43,4 @@ EC_PWD=$(grep -h "^ec_password" $FILES | awk '{print $2}')
 		echo $line
 	    done
 	fi
-} | nc "$EC_ADDRESS" "$EC_PORT"
+} | nc -q 1 "$EC_ADDRESS" "$EC_PORT"
