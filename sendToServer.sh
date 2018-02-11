@@ -33,7 +33,10 @@ FILES=$(find $CONF_DIR -maxdepth 1 -name '*.cfg')
 EC_PORT=$(grep -h "^ec_port" $FILES | awk '{print $2}')
 EC_PWD=$(grep -h "^ec_password" $FILES | awk '{print $2}')
 
+NETCAT="nc -q 1"
+nc --help |& grep -q BusyBox && NETCAT="nc"
 
+echo $NETCAT
 {
 	echo "$EC_PWD"
 	if [ -t 0 ]; then
@@ -43,4 +46,4 @@ EC_PWD=$(grep -h "^ec_password" $FILES | awk '{print $2}')
 		echo $line
 	    done
 	fi
-} | nc -q 1 "$EC_ADDRESS" "$EC_PORT"
+} | $NETCAT "$EC_ADDRESS" "$EC_PORT"
