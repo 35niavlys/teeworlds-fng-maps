@@ -2,6 +2,7 @@
 
 CURRENT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 
+FUNCTION=cat
 RUN=false
 
 OPTION_MAX_CLIENTS=16
@@ -38,6 +39,9 @@ for i in "$@" ; do
 	case $i in
 		--run)
 			RUN=true
+		;;
+		--discard=*)
+			FUNCTION="egrep -v ${i#*=}"
 		;;
 		--max-clients=*)
 			OPTION_MAX_CLIENTS=${i#*=}
@@ -109,7 +113,7 @@ add_vote() {
 
 add_footer () {
 	set_prefix $1
-	FOOTER_SPACE="$FOOTER_SPACE "
+	FOOTER_SPACE="${FOOTER_SPACE}."
 	add_to_conf "add_vote \"$PREFIX╰──────┤ $FOOTER_SPACE\" \"$OPTION_NO_ACTION\""
 	add_empty_vote $1
 }
@@ -263,11 +267,16 @@ find -maxdepth 1 -type d | sort | while read MAPS_DIR ; do
 	if [ -f "$MAPS_DIR/folder.name" ] ; then
 		DIR_NAME=$(< "$MAPS_DIR/folder.name")
 	fi
-
-	MAPS=$(find "$MAPS_DIR" -maxdepth 1 -name '*.map' -type f | sort | sed 's/\.\/\(.*\)\.map/\1/')
+	
+	MAPS=$(find "$MAPS_DIR" -maxdepth 1 -name '*.map' -type f | $FUNCTION | sort | sed 's/\.\/\(.*\)\.map/\1/')
 	if [ -n "$MAPS" ] ; then
 		MAP_ROTATION="sv_maprotation $(echo $MAPS)"
-		add_header 1 "$DIR_NAME (vote to set rotation)" "$MAP_ROTATION"
+		MAP_ROTATION_LENGTH=$(echo "$MAP_ROTATION" | wc -c)
+		if [ $MAP_ROTATION_LENGTH -gt 1000 ] ; then
+			add_header 1 "$DIR_NAME" "say too much map"
+		else
+			add_header 1 "$DIR_NAME (set rotation)" "$MAP_ROTATION"
+		fi
 		echo "$MAPS" | while read MAP_PATH ; do
 			unset NAME RANK
 			NAME=$(basename "$MAP_PATH")
