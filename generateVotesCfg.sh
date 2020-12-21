@@ -262,7 +262,7 @@ if [ "$OPTION_RANDOM_MAP" = "true" ] ; then
 	add_empty_vote 1
 fi
 
-find -maxdepth 1 -type d | sort | while read MAPS_DIR ; do
+find -maxdepth 1 -type d | sort -f | while read MAPS_DIR ; do
 	DIR_NAME="${MAPS_DIR#*/}"
 	if [ -f "$MAPS_DIR/folder.name" ] ; then
 		DIR_NAME=$(< "$MAPS_DIR/folder.name")
