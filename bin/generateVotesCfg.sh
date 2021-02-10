@@ -1,6 +1,7 @@
 #!/bin/bash
 
-CURRENT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+SCRIPT_DIR="${0%/*}"
+BASEDIR="$SCRIPT_DIR/.."
 
 FUNCTION=cat
 RUN=false
@@ -15,8 +16,8 @@ OPTION_RANDOM_MAP=false
 
 OPTION_NO_ACTION="say idiots"
 
-if [ -f "$CURRENT_DIR/SETTINGS" ] ; then
-	. "$CURRENT_DIR/SETTINGS"
+if [ -f "$SCRIPT_DIR/conf/SETTINGS" ] ; then
+	. "$SCRIPT_DIR/conf/SETTINGS"
 fi
 
 ###################
@@ -76,7 +77,7 @@ done
 
 ###################
 
-MAPS_DIR="$CURRENT_DIR/data/maps/"
+MAPS_DIR="$BASEDIR/data/maps/"
 cd "$MAPS_DIR" || { echo "$MAPS_DIR NOT EXISTS" ; exit 1 ; }
 
 ###################
@@ -113,14 +114,14 @@ add_vote() {
 
 add_footer () {
 	set_prefix $1
-	FOOTER_SPACE="${FOOTER_SPACE}."
+	#FOOTER_SPACE="${FOOTER_SPACE}."
 	add_to_conf "add_vote \"$PREFIX╰──────┤ $FOOTER_SPACE\" \"$OPTION_NO_ACTION\""
 	add_empty_vote $1
 }
 
 add_empty_vote() {
 	set_prefix $1
-	EMPTY_VOTE_SPACE="$EMPTY_VOTE_SPACE "
+	#EMPTY_VOTE_SPACE="$EMPTY_VOTE_SPACE "
 	add_to_conf "add_vote \"$PREFIX$EMPTY_VOTE_SPACE\" \"$OPTION_NO_ACTION\""
 	add_to_conf
 }
