@@ -27,15 +27,24 @@ while read -r LINE ; do
 	    else
 		PARAM=$(echo "$LINE" | sed 's/.*\!gt\(.*\)/\1/')
 		echo "PARAM=\"$PARAM\""
-		OPTION=$(echo "$PARAM " | perl -pe 's/.*?([a-z][a-z]|):([a-z][a-z]|).*/\1:\2/')
+		OPTION=$(echo "$PARAM " | grep -Eo '([a-z][a-z]|):([a-z][a-z]|) ' | tail -1)
 		echo "OPTION=\"$OPTION\""
 		TEXT=$(echo "$PARAM " | sed -r 's/ [a-z]?[a-z]?:[a-z]?[a-z]? / /g')
 		TEXT=$(trim $TEXT)
 		echo "TEXT=\"$TEXT\""
+		if [ -z "$OPTION" ] ; then
+		    OPTION=":en"
+		fi
 		if [ -z "$TEXT" ] ; then
 		    TEXT="$LAST_SAY"
 		fi
-		TRANSLATION=$(timeout 5s trans -brief $OPTION "$TEXT" 2>/dev/null)
+		TEXT=$(echo "$TEXT" | sed 's/^:*//')
+		echo "timeout 5s trans -e google -brief $OPTION '$TEXT'"
+		TRANSLATION=$(timeout 5s trans -e google -brief $OPTION "$TEXT" 2>/dev/null)
+		if [ -z "$TRANSLATION" ] ; then
+		    echo "timeout 5s trans -e bing -brief $OPTION '$TEXT'"
+		    TRANSLATION=$(timeout 5s trans -e bing -brief $OPTION "$TEXT" 2>/dev/null)
+		fi
 		if [ $? -eq 0 ]; then
 		    echo "TRANSLATION=\"$TRANSLATION\""
 		    TRANSLATION=$(trim $TRANSLATION)
