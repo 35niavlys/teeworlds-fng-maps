@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -o noglob
+
 EC_ADDRESS=127.0.0.1
 CONF_DIR=conf
 
