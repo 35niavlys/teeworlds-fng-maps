@@ -9,8 +9,11 @@ RUN=false
 OPTION_MAX_CLIENTS=16
 OPTION_NB_TEAMS=2
 OPTION_MAX_PLAYERS_PER_TEAM=8
+OPTION_ROUNDS=3
+OPTION_SCORELIMIT=true
 OPTION_TIMELIMIT=false
 OPTION_WEAPONS=false
+OPTION_MISC=true
 OPTION_PHYSIC=false
 OPTION_RANDOM_MAP=false
 
@@ -28,8 +31,11 @@ show_help() {
 	echo "  --max-clients=<integer>              Default is 16"
 	echo "  --nb-teams=[1|2]                     Default is 2"
 	echo "  --max-players-per-team=<integer>     Default is 8"
-	echo "  --physic=[true|false]            Default is false"
+	echo "  --rounds=<integer>                   Default is 3"
+	echo "  --misc=[true|false]                  Default is true"
+	echo "  --physic=[true|false]                Default is false"
 	echo "  --random-map=[true|false]            Default is false"
+	echo "  --scorelimit=[true|false]            Default is true"
 	echo "  --timelimit=[true|false]             Default is false"
 	echo "  --tune=[true|false]                  Default is false"
 	echo "  --weapons=[true|false]               Default is false"
@@ -53,11 +59,20 @@ for i in "$@" ; do
 		--max-players-per-team=*)
 			OPTION_MAX_PLAYERS_PER_TEAM=${i#*=}
 		;;
+		--rounds=*)
+			OPTION_ROUNDS=${i#*=}
+		;;
 		--random-map=*)
 			OPTION_RANDOM_MAP=${i#*=}
 		;;
+		--misc=*)
+			OPTION_MISC=${i#*=}
+		;;
 		--physic=*)
 			OPTION_PHYSIC=${i#*=}
+		;;
+		--scorelimit=*)
+			OPTION_SCORELIMIT=${i#*=}
 		;;
 		--timelimit=*)
 			OPTION_TIMELIMIT=${i#*=}
@@ -142,14 +157,16 @@ add_to_conf clear_votes
 
 ###################
 
-add_header 0 Misc
+if [ "$OPTION_MISC" = "true" ] ; then
+	add_header 0 Misc
 
-add_vote 0 "Restart game" "restart"
-if [ $OPTION_NB_TEAMS -gt 1 ] ; then
-	add_vote 0 "Shuffle teams" "shuffle_teams"
+	add_vote 0 "Restart game" "restart"
+	if [ $OPTION_NB_TEAMS -gt 1 ] ; then
+		add_vote 0 "Shuffle teams" "shuffle_teams"
+	fi
+
+	add_footer 0
 fi
-
-add_footer 0
 
 ###################
 
@@ -174,15 +191,17 @@ fi
 
 ###################
 
-add_header 0 "Score limit"
+if [ "$OPTION_SCORELIMIT" = "true" ] ; then
+	add_header 0 "Score limit"
 
-add_vote 0 "Score limit 100" "sv_scorelimit 100"
-add_vote 0 "Score limit 250" "sv_scorelimit 250"
-add_vote 0 "Score limit 500" "sv_scorelimit 500"
-add_vote 0 "Score limit 700" "sv_scorelimit 700"
-add_vote 0 "Score limit 1000" "sv_scorelimit 1000"
+	add_vote 0 "Score limit 100" "sv_scorelimit 100"
+	add_vote 0 "Score limit 250" "sv_scorelimit 250"
+	add_vote 0 "Score limit 500" "sv_scorelimit 500"
+	add_vote 0 "Score limit 700" "sv_scorelimit 700"
+	add_vote 0 "Score limit 1000" "sv_scorelimit 1000"
 
-add_footer 0
+	add_footer 0
+fi
 
 ###################
 
@@ -200,13 +219,15 @@ fi
 
 ###################
 
-add_header 0 Rounds
+if [ $OPTION_ROUNDS -gt 0 ] ; then
+	add_header 0 Rounds
 
-add_vote 0 "1 round par map" "sv_rounds_per_map 1"
-add_vote 0 "2 round par map" "sv_rounds_per_map 2"
-add_vote 0 "3 round par map" "sv_rounds_per_map 3"
+	for (( i=1; i<=$OPTION_ROUNDS; i++ )) ; do  
+		add_vote 0 "$i round par map" "sv_rounds_per_map $i"
+	done
 
-add_footer 0
+	add_footer 0
+fi
 
 ###################
 
@@ -271,12 +292,16 @@ find -maxdepth 1 -type d | sort -f | while read MAPS_DIR ; do
 	
 	MAPS=$(find "$MAPS_DIR" -maxdepth 1 -name '*.map' -type f | $FUNCTION | sort | sed 's/\.\/\(.*\)\.map/\1/')
 	if [ -n "$MAPS" ] ; then
-		MAP_ROTATION="sv_maprotation $(echo $MAPS)"
-		MAP_ROTATION_LENGTH=$(echo "$MAP_ROTATION" | wc -c)
-		if [ $MAP_ROTATION_LENGTH -gt 1000 ] ; then
-			add_header 1 "$DIR_NAME" "say too much map"
+		if [ "$OPTION_RANDOM_MAP" = "true" ] ; then
+			MAP_ROTATION="sv_maprotation $(echo $MAPS)"
+			MAP_ROTATION_LENGTH=$(echo "$MAP_ROTATION" | wc -c)
+			if [ $MAP_ROTATION_LENGTH -gt 1000 ] ; then
+				add_header 1 "$DIR_NAME" "say too much map"
+			else
+				add_header 1 "$DIR_NAME (set rotation)" "$MAP_ROTATION"
+			fi
 		else
-			add_header 1 "$DIR_NAME (set rotation)" "$MAP_ROTATION"
+			add_header 1 "$DIR_NAME"
 		fi
 		echo "$MAPS" | while read MAP_PATH ; do
 			unset NAME RANK
