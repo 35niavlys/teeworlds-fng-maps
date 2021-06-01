@@ -8,6 +8,7 @@ RUN=false
 
 OPTION_MAX_CLIENTS=16
 OPTION_NB_TEAMS=2
+OPTION_MIN_PLAYERS_PER_TEAM=1
 OPTION_MAX_PLAYERS_PER_TEAM=8
 OPTION_ROUNDS=3
 OPTION_SCORELIMIT=true
@@ -30,6 +31,7 @@ show_help() {
 	echo "  --run                                Will dump the generated config"
 	echo "  --max-clients=<integer>              Default is 16"
 	echo "  --nb-teams=[1|2]                     Default is 2"
+	echo "  --min-players-per-team=<integer>     Default is 1"
 	echo "  --max-players-per-team=<integer>     Default is 8"
 	echo "  --rounds=<integer>                   Default is 3"
 	echo "  --misc=[true|false]                  Default is true"
@@ -55,6 +57,9 @@ for i in "$@" ; do
 		;;
 		--nb-teams=*)
 			OPTION_NB_TEAMS=${i#*=}
+		;;
+		--min-players-per-team=*)
+			OPTION_MIN_PLAYERS_PER_TEAM=${i#*=}
 		;;
 		--max-players-per-team=*)
 			OPTION_MAX_PLAYERS_PER_TEAM=${i#*=}
@@ -171,7 +176,7 @@ fi
 ###################
 
 if [ $OPTION_MAX_PLAYERS_PER_TEAM -gt 0 ] ; then
-	add_header 0 "Max player"
+	add_header 0 "Max players"
 	
 	MINIMAL_SPECTATOR_SLOTS=$(( $OPTION_MAX_CLIENTS - $OPTION_NB_TEAMS * $OPTION_MAX_PLAYERS_PER_TEAM ))
 	[ $MINIMAL_SPECTATOR_SLOTS -lt 0 ] && MINIMAL_SPECTATOR_SLOTS=0
@@ -179,10 +184,12 @@ if [ $OPTION_MAX_PLAYERS_PER_TEAM -gt 0 ] ; then
 	for SPECTATOR_SLOTS in $(seq $(( $OPTION_MAX_CLIENTS - 2 )) -$OPTION_NB_TEAMS $MINIMAL_SPECTATOR_SLOTS) ; do
 		NB=$(( $OPTION_MAX_CLIENTS - $SPECTATOR_SLOTS ))
 		NB=$(( $NB / $OPTION_NB_TEAMS ))
-		if [ $OPTION_NB_TEAMS -eq 1 ] ; then
-			add_vote 0 "$NB players" "sv_spectator_slots $SPECTATOR_SLOTS"
-		elif [ $OPTION_NB_TEAMS -eq 2 ] ; then
-			add_vote 0 "$NB vs $NB" "sv_spectator_slots $SPECTATOR_SLOTS"
+		if [ $OPTION_MIN_PLAYERS_PER_TEAM -le $NB ] ; then
+			if [ $OPTION_NB_TEAMS -eq 1 ] ; then
+				add_vote 0 "$NB players" "sv_spectator_slots $SPECTATOR_SLOTS"
+			elif [ $OPTION_NB_TEAMS -eq 2 ] ; then
+				add_vote 0 "$NB vs $NB" "sv_spectator_slots $SPECTATOR_SLOTS"
+			fi
 		fi
 	done
 
