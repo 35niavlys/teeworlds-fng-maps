@@ -6,6 +6,7 @@ BASEDIR="$SCRIPT_DIR/.."
 FUNCTION=cat
 RUN=false
 
+OPTION_START_CLEAR=true
 OPTION_MAX_CLIENTS=16
 OPTION_NB_TEAMS=2
 OPTION_MIN_PLAYERS_PER_TEAM=1
@@ -29,6 +30,7 @@ fi
 show_help() {
 	echo "$0    Usage:"
 	echo "  --run                                Will dump the generated config"
+	echo "  --start-clear=[true|false]           Default is true"
 	echo "  --max-clients=<integer>              Default is 16"
 	echo "  --nb-teams=[1|2]                     Default is 2"
 	echo "  --min-players-per-team=<integer>     Default is 1"
@@ -51,6 +53,9 @@ for i in "$@" ; do
 		;;
 		--discard=*)
 			FUNCTION="egrep -v ${i#*=}"
+		;;
+		--start-clear=*)
+			OPTION_START_CLEAR=${i#*=}
 		;;
 		--max-clients=*)
 			OPTION_MAX_CLIENTS=${i#*=}
@@ -158,7 +163,7 @@ set_stars() {
 
 ###################
 
-add_to_conf clear_votes
+$OPTION_START_CLEAR && add_to_conf clear_votes
 
 ###################
 
