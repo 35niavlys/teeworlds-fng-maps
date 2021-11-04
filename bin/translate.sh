@@ -39,11 +39,11 @@ while read -r LINE ; do
 		    TEXT="$LAST_SAY"
 		fi
 		TEXT=$(echo "$TEXT" | sed 's/^:*//')
-		echo "timeout 5s trans -e google -brief $OPTION '$TEXT'"
-		TRANSLATION=$(timeout 5s trans -e google -brief $OPTION "$TEXT" 2>/dev/null)
+		echo "timeout 5s trans -- -e google -brief $OPTION '$TEXT'"
+		TRANSLATION=$(timeout 5s trans -- -e google -brief $OPTION "$TEXT" 2>/dev/null)
 		if [ -z "$TRANSLATION" ] ; then
-		    echo "timeout 5s trans -e bing -brief $OPTION '$TEXT'"
-		    TRANSLATION=$(timeout 5s trans -e bing -brief $OPTION "$TEXT" 2>/dev/null)
+		    echo "timeout 5s trans -- -e bing -brief $OPTION '$TEXT'"
+		    TRANSLATION=$(timeout 5s trans -- -e bing -brief $OPTION "$TEXT" 2>/dev/null)
 		fi
 		if [ $? -eq 0 ]; then
 		    echo "TRANSLATION=\"$TRANSLATION\""
