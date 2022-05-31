@@ -287,6 +287,7 @@ if [ "$OPTION_RANDOM_MAP" = "true" ] ; then
 	add_vote 0 "Random map >= ★★★☆☆" "exec conf/vote_random_map_3.cfg"
 	add_vote 0 "Random map >= ★★☆☆☆" "exec conf/vote_random_map_2.cfg"
 	add_vote 0 "Random map >= ★☆☆☆☆" "exec conf/vote_random_map_1.cfg"
+	add_vote 0 "No rotation" "sv_maprotation no_rotation"
 	add_vote 0 "Random rotation with all maps" "sv_maprotation activate_random_rotation"
 	add_vote 0 "Random rotation >= ★★★★★" "sv_maprotation activate_random_rotation_5"
 	add_vote 0 "Random rotation >= ★★★★☆" "sv_maprotation activate_random_rotation_4"
