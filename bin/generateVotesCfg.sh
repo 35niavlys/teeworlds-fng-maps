@@ -129,7 +129,8 @@ add_header() {
 	if [ -z "$VAR2" ] ; then
 		VAR2="$OPTION_NO_ACTION"
 	fi
-	add_to_conf "add_vote \"$PREFIX╭──────┤ $VAR1\" \"$VAR2\""
+	DESC="$PREFIX╭──────┤ $VAR1"
+	add_to_conf "add_vote \"${DESC:0:45}\" \"$VAR2\""
 }
 
 add_vote() {
